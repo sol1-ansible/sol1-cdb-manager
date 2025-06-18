@@ -1,0 +1,9 @@
+---
+cdb_manager_packages_override: []
+# This may need 
+cdb_manager_cdb_command: "cdb"
+
+# cdb_manager_files:
+#   - file_name: blocklist.txt
+#     dest_dir: /etc/dnsdist
+
