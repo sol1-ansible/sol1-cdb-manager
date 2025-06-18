@@ -1,4 +1,5 @@
 ---
+cdb_manager_install: false
 cdb_manager_packages_override: []
 # This may need 
 cdb_manager_cdb_command: "cdb"

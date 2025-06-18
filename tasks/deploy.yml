@@ -1,0 +1,39 @@
+- name: Check if config directories exist
+  stat:
+    path: "{{ item.dest_dir }}"
+  loop: "{{ cdb_manager_files }}"
+  loop_control:
+    label: "{{ item.dest_dir }}"
+  register: cdb_manager_dir_stats
+
+- name: Create config directories only if they do not exist
+  file:
+    path: "{{ item.0.dest_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when: not item.1.stat.exists
+  loop: "{{ cdb_manager_files | zip(cdb_manager_dir_stats.results) | list }}"
+  loop_control:
+    label: "{{ item.0.dest_dir }}"
+
+- name: Deploy CDB input files
+  copy:
+    src: "files/{{ item.file_name }}"
+    dest: "{{ item.dest_dir }}/{{ item.file_name }}"
+    mode: '0644'
+  loop: "{{ cdb_manager_files }}"
+  notify: Regenerate .cdb files
+
+- name: Install required CDB manager packages
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ _cdb_manager_packages }}"
+
+- name: Regenerate .cdb files
+  command: "{{ cdb_manager_cdb_command }} -c {{ item.dest_dir }}/{{ item.file_name | regex_replace('\\.txt$', '.cdb') }} {{ item.dest_dir }}/{{ item.file_name }}"
+  loop: "{{ cdb_manager_files }}"
+  become: true
+  when: cdb_manager_cdb_command == 'cdb'
