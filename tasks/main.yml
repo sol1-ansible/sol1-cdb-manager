@@ -4,5 +4,5 @@
 
 - name: Get CDB variables
   include_tasks: deploy.yml
-  when: cdb_manager_install
+  when: cdb_manager_enable
 
