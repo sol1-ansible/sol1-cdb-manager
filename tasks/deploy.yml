@@ -24,7 +24,13 @@
     dest: "{{ item.dest_dir }}/{{ item.file_name }}"
     mode: '0644'
   loop: "{{ cdb_manager_files }}"
+  register: cdb_copy_results
   notify: Regenerate .cdb files
+
+- name: Mark CDB manager as changed if any file was copied
+  set_fact:
+    cdb_manager_changed: true
+  when: cdb_copy_results.results | selectattr('changed') | list | length > 0
 
 - name: Install required CDB manager packages
   ansible.builtin.package:
