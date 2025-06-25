@@ -5,5 +5,11 @@ After=network-online.target
 
 [Service]
 Type=oneshot
+{% if cdb_manager_http_proxy %}
+Environment="http_proxy={{  cdb_manager_http_proxy  }}"
+{% endif %}
+{% if cdb_manager_https_proxy %}
+Environment="https_proxy={{ cdb_manager_https_proxy }}"
+{% endif %}
 ExecStart={{ cdb_manager_fetch_script_path }}
 

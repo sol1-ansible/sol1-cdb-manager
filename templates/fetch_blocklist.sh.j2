@@ -2,6 +2,15 @@
 set -euo pipefail
 
 URL="{{ cdb_manager_blocklist_url }}"
+# Proxy variables injected by systemd unit if configured.
+# curl will obey them automatically, but we also form --proxy
+PROXY_OPT=""
+if [[ -n "${https_proxy:-}" ]]; then
+  PROXY_OPT="--proxy ${https_proxy}"
+elif [[ -n "${http_proxy:-}" ]]; then
+  PROXY_OPT="--proxy ${http_proxy}"
+fi
+
 DEST_DIR="{{ (cdb_manager_files | first).dest_dir }}"
 DEST_TXT="${DEST_DIR}/blocklist.txt"
 DEST_CDB="${DEST_TXT%.txt}.cdb"
@@ -9,20 +18,17 @@ SRC_WORD="{{ cdb_manager_blocklist_source_word }}"
 TAG="cdb-blocklist-fetch"
 
 TMP=$(mktemp)
+cleanup() { rm -f "$TMP" "$TMP.parsed"; }; trap cleanup EXIT
 
-cleanup() { rm -f "$TMP" "$TMP.parsed"; }
-trap cleanup EXIT
-
-# download
-if ! curl -fsSL "$URL" -o "$TMP"; then
+# download (honours proxy if set)
+if ! curl -fsSL $PROXY_OPT "$URL" -o "$TMP"; then
   logger -t "$TAG" "download failed – keeping previous list"
   exit 0
 fi
 
-# add column 2
+# add 2nd column, compare, regenerate … (unchanged below)
 awk -v w="$SRC_WORD" '{print $0 " " w}' "$TMP" > "$TMP.parsed"
 
-# update only if list changed
 if ! cmp -s "$TMP.parsed" "$DEST_TXT"; then
   mv "$TMP.parsed" "$DEST_TXT"
   logger -t "$TAG" "blocklist updated ($(wc -l < "$DEST_TXT") domains)"

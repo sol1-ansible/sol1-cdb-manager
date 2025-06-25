@@ -23,3 +23,5 @@ cdb_manager_packages:
   - tinycdb
   - curl
 
+cdb_manager_http_proxy:  ""
+cdb_manager_https_proxy: ""
