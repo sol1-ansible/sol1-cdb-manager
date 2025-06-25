@@ -1,0 +1,9 @@
+[Unit]
+Description=Fetch DNS blocklist and build CDB
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart={{ cdb_manager_fetch_script_path }}
+

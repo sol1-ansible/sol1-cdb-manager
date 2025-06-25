@@ -4,5 +4,6 @@
 
 - name: Get CDB variables
   include_tasks: deploy.yml
-  when: cdb_manager_enable
 
+- name: Install auto-fetch + systemd timer
+  include_tasks: fetch.yml

@@ -1,7 +1,7 @@
-- name: Regenerate .cdb files
-  become: true
-  when: cdb_manager_cdb_command == 'cdb'
-  block:
-    - name: Regenerate each .cdb file
-      command: "{{ cdb_manager_cdb_command }} -c {{ item.dest_dir }}/{{ item.file_name | regex_replace('\\.txt$', '.cdb') }} {{ item.dest_dir }}/{{ item.file_name }}"
-      loop: "{{ cdb_manager_files }}"
+- name: Regenerate each .cdb file
+  command: "{{ cdb_manager_cdb_command }} -c {{ item.dest_dir }}/{{ item.file_name | regex_replace('\\.txt$', '.cdb') }} {{ item.dest_dir }}/{{ item.file_name }}"
+  loop: "{{ cdb_manager_files }}"
+
+- name: daemon-reload
+  systemd:
+    daemon_reload: yes

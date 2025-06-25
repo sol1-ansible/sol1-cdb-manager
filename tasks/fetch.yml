@@ -1,0 +1,27 @@
+---
+- name: Install block-list fetch script
+  template:
+    src: fetch_blocklist.sh.j2
+    dest: "{{ cdb_manager_fetch_script_path }}"
+    mode: '0755'
+
+- name: Install systemd service
+  template:
+    src: cdb-blocklist-fetch.service.j2
+    dest: "/etc/systemd/system/{{ cdb_manager_systemd_base_name }}.service"
+    mode: '0644'
+  notify: daemon-reload
+
+- name: Install systemd timer
+  template:
+    src: cdb-blocklist-fetch.timer.j2
+    dest: "/etc/systemd/system/{{ cdb_manager_systemd_base_name }}.timer"
+    mode: '0644'
+  notify: daemon-reload
+
+- name: Enable + start timer
+  systemd:
+    name: "{{ cdb_manager_systemd_base_name }}.timer"
+    enabled: true
+    state: started
+
