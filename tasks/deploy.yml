@@ -25,7 +25,7 @@
     mode: '0644'
   loop: "{{ cdb_manager_files }}"
   register: cdb_copy_results
-  notify: Regenerate .cdb files
+  notify: Regenerate .cdb file
 
 - name: Mark CDB manager as changed if any file was copied
   set_fact:
@@ -38,8 +38,3 @@
     state: present
   loop: "{{ _cdb_manager_packages }}"
 
-- name: Regenerate .cdb files
-  command: "{{ cdb_manager_cdb_command }} -c {{ item.dest_dir }}/{{ item.file_name | regex_replace('\\.txt$', '.cdb') }} {{ item.dest_dir }}/{{ item.file_name }}"
-  loop: "{{ cdb_manager_files }}"
-  become: true
-  when: cdb_manager_cdb_command == 'cdb'
