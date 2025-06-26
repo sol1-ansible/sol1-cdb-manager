@@ -1,3 +1,9 @@
+- name: Install required CDB manager packages
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ _cdb_manager_packages }}"
+
 - name: Check if config directories exist
   stat:
     path: "{{ item.dest_dir }}"
@@ -25,16 +31,11 @@
     mode: '0644'
   loop: "{{ cdb_manager_files }}"
   register: cdb_copy_results
-  notify: Regenerate .cdb file
 
 - name: Mark CDB manager as changed if any file was copied
   set_fact:
     cdb_manager_changed: true
   when: cdb_copy_results.results | selectattr('changed') | list | length > 0
+  notify: Regenerate .cdb file
 
-- name: Install required CDB manager packages
-  ansible.builtin.package:
-    name: "{{ item }}"
-    state: present
-  loop: "{{ _cdb_manager_packages }}"
 
