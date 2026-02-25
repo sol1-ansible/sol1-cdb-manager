@@ -36,6 +36,6 @@
   set_fact:
     cdb_manager_changed: true
   when: cdb_copy_results.results | selectattr('changed') | list | length > 0
-  notify: Regenerate .cdb file
+  notify: Regenerate each .cdb file
 
 
